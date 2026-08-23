@@ -22,6 +22,6 @@ public class ProgramadorRutasTest {
 
         programador.programar(horario);
 
-        assertEquals(1, programador.consultarTodos().size());
+        assertEquals(1, programador.getHorarios().size());
     }
 }
