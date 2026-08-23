@@ -11,17 +11,17 @@ public class App {
         System.out.println("Test Driven Development with JUnit 5");
 
         List<Bus> buses = new ArrayList<>();
-        Bus bus = new Bus("ABC123", "Autobus");
-        Bus bus2 = new Bus("XYZ789", "Minibus");
-        Bus bus3 = new Bus("LMN456", "Autobus");
+        Bus bus = new Bus("ABC123", "Diesel");
+        Bus bus2 = new Bus("XYZ789", "Electric");
+        Bus bus3 = new Bus("LMN456", "Hybrid");
         buses.add(bus);
         buses.add(bus2);
         buses.add(bus3);
 
         List<Ruta> rutas = new ArrayList<>();
-        Ruta ruta = new Ruta("R001", "Ciudad A", "Ciudad B");
-        Ruta ruta2 = new Ruta("R002", "Ciudad C", "Ciudad D");
-        Ruta ruta3 = new Ruta("R003", "Ciudad E", "Ciudad F");
+        Ruta ruta = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+        Ruta ruta2 = new Ruta("General", "R002", "Ciudad C", "Ciudad D");
+        Ruta ruta3 = new Ruta("General", "R003", "Ciudad E", "Ciudad F");
         rutas.add(ruta);
         rutas.add(ruta2);
         rutas.add(ruta3);

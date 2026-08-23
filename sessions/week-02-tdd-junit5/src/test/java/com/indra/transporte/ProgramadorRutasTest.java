@@ -13,8 +13,8 @@ public class ProgramadorRutasTest {
     @Test
     @DisplayName("Debe registrar un horario")
     void debeRegistrarUnHorario() {
-        Bus bus = new Bus("ABC123", "Autobus");
-        Ruta ruta = new Ruta("R001", "Ciudad A", "Ciudad B");
+        Bus bus = new Bus("ABC123", "Diesel");
+        Ruta ruta = new Ruta("Electric","R001", "Ciudad A", "Ciudad B");
         Horario horario = new Horario(bus, ruta,
                 java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
 
