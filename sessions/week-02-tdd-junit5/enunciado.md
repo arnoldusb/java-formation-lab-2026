@@ -9,7 +9,7 @@ El equipo de **Indra Transport** necesita un Programador de Rutas para su modulo
 Usando el ciclo **red → green → refactor**:
 
 1. `ProgramadorRutas.debeValidarTipoRutasYBuses()` los buses electricos solo pueden ir a rutas electricas, los demas a todas las rutas:
-2. `ProgramadorRutas.consultarHorariosPorBus(bus,tipo)` debe retornar los horarios por tipo de bus:
+2. `ProgramadorRutas.consultarHorariosPorTipoBus(bus,tipo)` debe retornar los horarios por tipo de bus:
    - bus desconocido: lanzar `IllegalArgumentException`
    - tipo desconocido: lanzar `UnsupportedTypeException`
 3. `ProgramadorRutas.debeRechazarHorarioSolapado()` Un bus no puede tener dos horarios que se solapen. 

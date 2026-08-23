@@ -1,9 +1,8 @@
 package com.indra.transporte;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
@@ -23,5 +22,20 @@ public class ProgramadorRutasTest {
         programador.programar(horario);
 
         assertEquals(1, programador.getHorarios().size());
+    }
+
+    @Test
+    @DisplayName("debe Validar Tipo Rutas Y Buses")
+    void debeValidarTipoRutasYBuses() {
+        // TODO: Implementar la prueba para validar el tipo de rutas y buses
+        fail("No implementado aún");
+    }
+
+    //consultarHorariosPorBus
+    @Test
+    @DisplayName("Debe consultar horarios por bus")
+    void debeConsultarHorariosPorTipoBus(Bus bus, String tipoBus) {
+        // TODO: Implementar la prueba para consultar horarios por bus según el tipo de bus
+        fail("No implementado aún");
     }
 }
