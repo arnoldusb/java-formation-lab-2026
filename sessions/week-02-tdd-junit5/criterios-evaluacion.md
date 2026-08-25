@@ -7,7 +7,7 @@
 - [ ] Los tests fallan antes de que exista la implementación (se deduce del historial)
 
 ### Tests
-- [ ] Al menos 5 tests cubriendo los escenarios del enunciado
+- [ ] Al menos 8 tests cubriendo los escenarios del enunciado
 - [ ] Tests para casos borde: Bus null o vacio, Tipo de bus desconocido, horarios solapados
 - [ ] `@DisplayName` o nombres de método que explican el escenario
 - [ ] Sin `if` ni lógica condicional dentro de los tests
