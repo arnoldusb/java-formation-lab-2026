@@ -19,9 +19,9 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        if (debeValidarTipoRutasYBuses(horario)) {
-            horarios.add(horario);
-        }
+        debeValidarTipoRutasYBuses(horario);
+        validarHorarioSolapado(horario);
+        horarios.add(horario);
     }
 
     public boolean debeValidarTipoRutasYBuses(Horario horario) {
@@ -35,6 +35,21 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
+    }
+
+    private void validarHorarioSolapado(Horario nuevoHorario) {
+        for (Horario horarioExistente : horarios) {
+            if (!Objects.equals(horarioExistente.getBus().getPlaca(), nuevoHorario.getBus().getPlaca())) {
+                continue;
+            }
+
+            boolean seSolapa = nuevoHorario.getHoraSalida().isBefore(horarioExistente.getHoraLlegada())
+                    && nuevoHorario.getHoraLlegada().isAfter(horarioExistente.getHoraSalida());
+
+            if (seSolapa) {
+                throw new IllegalArgumentException("El horario se solapa con otro ya programado");
+            }
+        }
     }
 
     public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
