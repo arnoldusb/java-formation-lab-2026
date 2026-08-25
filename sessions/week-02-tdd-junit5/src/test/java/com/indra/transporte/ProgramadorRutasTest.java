@@ -171,4 +171,61 @@ public class ProgramadorRutasTest {
             }
         }
     }
+
+    @Nested
+    @DisplayName("Cuando el rango del horario es inválido")
+    class CuandoElRangoDelHorarioEsInvalido {
+
+        @Test
+        @DisplayName("Debe rechazar una hora de llegada menor a la de salida")
+        void debeRechazarHorarioRangoInvalido() {
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta ruta = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Horario horario = new Horario(bus, ruta,
+                    java.time.LocalTime.of(10, 0), java.time.LocalTime.of(8, 0));
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(horario);
+            });
+
+            assertEquals("La hora de llegada debe ser mayor a la de salida", exception.getMessage());
+        }
+    }
+
+    @Nested
+    @DisplayName("Cuando el horario es nulo o vacío")
+    class CuandoElHorarioEsNuloOInvalido {
+
+        @Test
+        @DisplayName("Debe rechazar un horario nulo")
+        void debeRechazarHorarioNulo() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(null);
+            });
+
+            assertEquals("El horario no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con bus nulo")
+        void debeRechazarHorarioConBusNulo() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(null, new Ruta("General", "R001", "Ciudad A", "Ciudad B"),
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+
+            assertEquals("El bus no puede ser nulo", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe rechazar un horario con ruta nula")
+        void debeRechazarHorarioConRutaNula() {
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(new Horario(new Bus("ABC123", "Diesel"), null,
+                        java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0)));
+            });
+
+            assertEquals("La ruta no puede ser nula", exception.getMessage());
+        }
+    }
 }
