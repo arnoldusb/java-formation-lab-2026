@@ -7,6 +7,7 @@ import java.util.Objects;
 import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
+import com.indra.transporte.model.Tipo;
 
 import lombok.Data;
 
@@ -40,7 +41,7 @@ public class ProgramadorRutas {
         String tipoBus = horario.getBus().getTipo();
         String tipoRuta = horario.getRuta().getTipo();
 
-        if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
+        if (Tipo.ELECTRIC.getValor().equals(tipoBus) && !Tipo.ELECTRIC.getValor().equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
@@ -66,7 +67,7 @@ public class ProgramadorRutas {
             throw new IllegalArgumentException("Bus desconocido");
         }
 
-        if (tipo == null || !("Electric".equals(tipo) || "Diesel".equals(tipo))) {
+        if (tipo == null || !Tipo.isSupported(tipo)) {
             throw new UnsupportedTypeException("Tipo de bus no soportado");
         }
 
