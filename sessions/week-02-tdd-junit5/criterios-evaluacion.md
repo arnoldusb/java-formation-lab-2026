@@ -16,7 +16,7 @@
 - [ ] Cálculo de horario correcto para tipo de Bus y Ruta
 - [ ] Asignacion correcta de horarios sin solapamiento de horas
 - [ ] `UnsupportedTypeException` lanzada para tipos desconocidos
-- [ ] `IllegalArgumentException` para rutas y buses desconocidos
+- [ ] `IllegalArgumentException` para rutas, buses u horarios desconocidos
 
 ### Calidad
 - [ ] `mvn verify` en verde
