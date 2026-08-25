@@ -4,10 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import com.indra.transporte.exception.UnsupportedTypeException;
 import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.Ruta;
@@ -72,6 +75,60 @@ public class ProgramadorRutasTest {
                     java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
 
             assertDoesNotThrow(() -> programador.debeValidarTipoRutasYBuses(horario));
+        }
+    }
+
+    @Nested
+    @DisplayName("Cuando consultamos horarios por tipo de bus")
+    class CuandoConsultamosHorariosPorTipoBus {
+
+        @Test
+        @DisplayName("Debe devolver los horarios del tipo solicitado")
+        void debeDevolverLosHorariosDelTipoSolicitado() {
+            Bus busElectrico = new Bus("ABC123", "Electric");
+            Bus busDiesel = new Bus("XYZ999", "Diesel");
+            Ruta rutaElectrica = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaGeneral = new Ruta("General", "R010", "Ciudad C", "Ciudad D");
+
+            Horario horario1 = new Horario(busElectrico, rutaElectrica,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            Horario horario2 = new Horario(busElectrico, rutaGeneral,
+                    java.time.LocalTime.of(12, 0), java.time.LocalTime.of(14, 0));
+            Horario horario3 = new Horario(busDiesel, rutaGeneral,
+                    java.time.LocalTime.of(9, 0), java.time.LocalTime.of(11, 0));
+
+            programador.programar(horario1);
+            programador.programar(horario2);
+            programador.programar(horario3);
+
+            List<Horario> horarios = programador.consultarHorariosPorTipoBus(busElectrico, "Electric");
+
+            assertEquals(2, horarios.size());
+            assertEquals(List.of(horario1, horario2), horarios);
+        }
+
+        @Test
+        @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
+        void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido() {
+            Bus busDesconocido = new Bus("ZZZ000", "Electric");
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.consultarHorariosPorTipoBus(busDesconocido, "Electric");
+            });
+
+            assertEquals("Bus desconocido", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
+        void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido() {
+            Bus bus = new Bus("ABC123", "Electric");
+
+            UnsupportedTypeException exception = assertThrows(UnsupportedTypeException.class, () -> {
+                programador.consultarHorariosPorTipoBus(bus, "TipoInvalido");
+            });
+
+            assertEquals("Tipo de bus no soportado", exception.getMessage());
         }
     }
 }
