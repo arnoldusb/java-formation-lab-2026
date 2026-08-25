@@ -132,4 +132,47 @@ public class ProgramadorRutasTest {
             assertEquals("Tipo de bus no soportado", exception.getMessage());
         }
     }
+
+    @Nested
+    @DisplayName("Cuando un bus ya tiene horarios programados")
+    class CuandoUnBusYaTieneHorariosProgramados {
+
+        @Test
+        @DisplayName("Debe rechazar un horario que se solapa con otro existente")
+        void debeRechazarHorarioSolapado() {
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta ruta1 = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Ruta ruta2 = new Ruta("General", "R002", "Ciudad A", "Ciudad C");
+
+            Horario horarioExistente = new Horario(bus, ruta1,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            Horario horarioSolapado = new Horario(bus, ruta2,
+                    java.time.LocalTime.of(8, 30), java.time.LocalTime.of(10, 30));
+
+            programador.programar(horarioExistente);
+
+            IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+                programador.programar(horarioSolapado);
+            });
+
+            assertEquals("El horario se solapa con otro ya programado", exception.getMessage());
+        }
+
+        @Test
+        @DisplayName("Debe permitir horarios que no se solapan")
+        void debePermitirHorariosQueNoSeSolapan() {
+            Bus bus = new Bus("ABC123", "Diesel");
+            Ruta ruta1 = new Ruta("General", "R001", "Ciudad A", "Ciudad B");
+            Ruta ruta2 = new Ruta("General", "R002", "Ciudad A", "Ciudad C");
+
+            Horario horarioExistente = new Horario(bus, ruta1,
+                    java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
+            Horario horarioNoSolapado = new Horario(bus, ruta2,
+                    java.time.LocalTime.of(10, 0), java.time.LocalTime.of(11, 0));
+
+            programador.programar(horarioExistente);
+
+            assertDoesNotThrow(() -> programador.programar(horarioNoSolapado));
+        }
+    }
 }
