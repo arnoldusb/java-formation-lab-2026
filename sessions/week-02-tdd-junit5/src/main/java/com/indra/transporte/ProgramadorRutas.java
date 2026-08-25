@@ -19,6 +19,15 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        if (horario.getBus() == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        if (horario.getRuta() == null) {
+            throw new IllegalArgumentException("La ruta no puede ser nula");
+        }
+        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
+            throw new IllegalArgumentException("La hora de llegada debe ser mayor a la de salida");
+        }
         debeValidarTipoRutasYBuses(horario);
         validarHorarioSolapado(horario);
         horarios.add(horario);
