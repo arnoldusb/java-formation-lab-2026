@@ -35,6 +35,6 @@ Usando el ciclo **red → green → refactor**:
 
 ## Bonus (opcional)
 
-- Implementar la clase Tipo (Bus y Ruta)
+- Implementar el objeto Tipo (Bus y Ruta)
 - Implementar `@ParameterizedTest` con `@CsvSource` para los escenarios de horario solapado.
-- Agregar un test de integración que use `@Nested` para CuandoBusYaTieneHorario.
+- Agregar un test de integración que use `@Nested` para CuandoUnBusYaTieneHorariosProgramados.

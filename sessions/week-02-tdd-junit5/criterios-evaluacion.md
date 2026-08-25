@@ -7,7 +7,7 @@
 - [ ] Los tests fallan antes de que exista la implementación (se deduce del historial)
 
 ### Tests
-- [ ] Al menos 5 tests cubriendo los escenarios del enunciado
+- [ ] Al menos 8 tests cubriendo los escenarios del enunciado
 - [ ] Tests para casos borde: Bus null o vacio, Tipo de bus desconocido, horarios solapados
 - [ ] `@DisplayName` o nombres de método que explican el escenario
 - [ ] Sin `if` ni lógica condicional dentro de los tests
@@ -16,7 +16,7 @@
 - [ ] Cálculo de horario correcto para tipo de Bus y Ruta
 - [ ] Asignacion correcta de horarios sin solapamiento de horas
 - [ ] `UnsupportedTypeException` lanzada para tipos desconocidos
-- [ ] `IllegalArgumentException` para rutas y buses desconocidos
+- [ ] `IllegalArgumentException` para rutas, buses u horarios desconocidos
 
 ### Calidad
 - [ ] `mvn verify` en verde

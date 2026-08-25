@@ -19,4 +19,17 @@ public class ProgramadorRutas {
         horarios.add(horario);
     }
 
+    public boolean debeValidarTipoRutasYBuses(Horario horario) {
+        if (horario == null) {
+            throw new IllegalArgumentException("El horario no puede ser nulo");
+        }
+        String tipoBus = horario.getBus().getTipo();
+        String tipoRuta = horario.getRuta().getTipo();
+
+        if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
+            throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
+        }
+        return true;
+    }
+
 }
