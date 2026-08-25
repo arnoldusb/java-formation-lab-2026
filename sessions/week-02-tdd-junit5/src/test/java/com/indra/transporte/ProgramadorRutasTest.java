@@ -87,12 +87,13 @@ public class ProgramadorRutasTest {
         void debeDevolverLosHorariosDelTipoSolicitado() {
             Bus busElectrico = new Bus("ABC123", "Electric");
             Bus busDiesel = new Bus("XYZ999", "Diesel");
-            Ruta rutaElectrica = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
-            Ruta rutaGeneral = new Ruta("General", "R010", "Ciudad C", "Ciudad D");
+            Ruta rutaElectrica1 = new Ruta("Electric", "R001", "Ciudad A", "Ciudad B");
+            Ruta rutaElectrica2 = new Ruta("Electric", "R010", "Ciudad C", "Ciudad D");
+            Ruta rutaGeneral = new Ruta("General", "R020", "Ciudad E", "Ciudad F");
 
-            Horario horario1 = new Horario(busElectrico, rutaElectrica,
+            Horario horario1 = new Horario(busElectrico, rutaElectrica1,
                     java.time.LocalTime.of(8, 0), java.time.LocalTime.of(10, 0));
-            Horario horario2 = new Horario(busElectrico, rutaGeneral,
+            Horario horario2 = new Horario(busElectrico, rutaElectrica2,
                     java.time.LocalTime.of(12, 0), java.time.LocalTime.of(14, 0));
             Horario horario3 = new Horario(busDiesel, rutaGeneral,
                     java.time.LocalTime.of(9, 0), java.time.LocalTime.of(11, 0));
