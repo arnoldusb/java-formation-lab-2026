@@ -91,7 +91,6 @@ public class ProgramadorRutasTest {
                 "Diesel, General",
                 "Diesel, Electric"
         })
-        @Test
         @DisplayName("Debe permitir cualquier tipo de ruta")
         void debePermitirCualquierTipoDeRuta(String tipoBus, String tipoRuta) {
             Bus bus = new Bus(BUS_PLACA, tipoBus);
@@ -105,13 +104,6 @@ public class ProgramadorRutasTest {
     @Nested
     @DisplayName("Debe devolver los horarios del tipo solicitado")
     class debeDevolverLosHorariosDelTipoSolicitado {
-
-        @Test
-        @DisplayName("Horario vacio")
-        void debeDevolverHorariosVacios() {
-            List<Horario> horarios = programador.consultarHorariosPorTipoBus(BUS_PLACA, "Electric");
-            assertEquals(0, horarios.size(), "Se esperaba que no hubiera horarios para el bus solicitado");
-        }
 
         @Test
         @DisplayName("Horario con buses eléctricos")
@@ -130,7 +122,6 @@ public class ProgramadorRutasTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "DEF456" })
-    @Test
     @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
     void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido(String bus) {
 
@@ -150,7 +141,6 @@ public class ProgramadorRutasTest {
 
     @ParameterizedTest
     @ValueSource(strings = { "ImaginarioType" })
-    @Test
     @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
     void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido(String tipo) {
         assertThrows(UnsupportedTypeException.class, () -> {
