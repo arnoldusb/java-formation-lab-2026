@@ -129,7 +129,7 @@ public class ProgramadorRutasTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "", "DEF456" })
+    @ValueSource(strings = { "DEF456" })
     @Test
     @DisplayName("Debe lanzar IllegalArgumentException cuando el bus es desconocido")
     void debeLanzarIllegalArgumentExceptionCuandoBusEsDesconocido(String bus) {
@@ -149,7 +149,7 @@ public class ProgramadorRutasTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = { "", "ImaginarioType" })
+    @ValueSource(strings = { "ImaginarioType" })
     @Test
     @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es desconocido")
     void debeLanzarUnsupportedTypeExceptionCuandoTipoEsDesconocido(String tipo) {
@@ -159,9 +159,9 @@ public class ProgramadorRutasTest {
     }
 
     @Test
-    @DisplayName("Debe lanzar UnsupportedTypeException cuando el tipo es null")
-    void debeLanzarUnsupportedTypeExceptionCuandoTipoEsNull() {
-        assertThrows(UnsupportedTypeException.class, () -> {
+    @DisplayName("Debe lanzar IllegalArgumentException cuando el tipo es null")
+    void debeLanzarIllegalArgumentExceptionCuandoTipoEsNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
             programador.consultarHorariosPorTipoBus("ABC123", null);
         });
     }

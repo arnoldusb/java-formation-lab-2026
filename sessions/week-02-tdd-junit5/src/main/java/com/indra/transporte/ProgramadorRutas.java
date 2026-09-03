@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.indra.transporte.model.Horario;
+import com.indra.transporte.model.TipoBus;
+import com.indra.transporte.model.TipoRuta;
 
 import lombok.Data;
 
@@ -23,18 +25,38 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        String tipoBus = horario.getBus().getTipo();
-        String tipoRuta = horario.getRuta().getTipo();
+        TipoBus tipoBus = TipoBus.from(horario.getBus().getTipo());
+        TipoRuta tipoRuta = TipoRuta.from(horario.getRuta().getTipo());
 
-        if ("Electric".equals(tipoBus) && !"Electric".equals(tipoRuta)) {
+        if (tipoBus == TipoBus.ELECTRIC && tipoRuta != TipoRuta.ELECTRIC) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
     }
 
     public List<Horario> consultarHorariosPorTipoBus(String busId, String tipoBus) {
-        // TODO completar despues de las pruebas
-        return new ArrayList<>();
+        if (busId == null || tipoBus == null) {
+            throw new IllegalArgumentException("El busId y el tipoBus no pueden ser nulos");
+        }
+        if (busId.isEmpty() || tipoBus.isEmpty()) {
+            throw new IllegalArgumentException("El busId y el tipoBus no pueden estar vacíos");
+        }
+        TipoBus tipoBusSolicitado = TipoBus.from(tipoBus);
+        List<Horario> horariosFiltrados = new ArrayList<>();
+        boolean busEncontrado = false;
+        for (Horario horario : horarios) {
+            if (horario.getBus().getPlaca().equals(busId)) {
+                busEncontrado = true;
+            }
+            if (horario.getBus().getPlaca().equals(busId)
+                    && TipoBus.from(horario.getBus().getTipo()) == tipoBusSolicitado) {
+                horariosFiltrados.add(horario);
+            }
+        }
+        if (!busEncontrado) {
+            throw new IllegalArgumentException("El bus no existe: " + busId);
+        }
+        return horariosFiltrados;
     }
 
 }
