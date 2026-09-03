@@ -32,4 +32,9 @@ public class ProgramadorRutas {
         return true;
     }
 
+    public List<Horario> consultarHorariosPorTipoBus(String busId, String tipoBus) {
+        // TODO completar despues de las pruebas
+        return new ArrayList<>();
+    }
+
 }
