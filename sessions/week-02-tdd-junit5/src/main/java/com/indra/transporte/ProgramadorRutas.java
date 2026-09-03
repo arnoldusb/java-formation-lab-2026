@@ -3,6 +3,8 @@ package com.indra.transporte;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.indra.transporte.exception.HorarioRangoInvalidoException;
+import com.indra.transporte.exception.HorarioSolapadoException;
 import com.indra.transporte.model.Horario;
 import com.indra.transporte.model.TipoBus;
 import com.indra.transporte.model.TipoRuta;
@@ -18,6 +20,8 @@ public class ProgramadorRutas {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
+        rechazarHorarioSolapado(horario);
+        rechazarHorarioRangoInvalido(horario);
         horarios.add(horario);
     }
 
@@ -58,5 +62,28 @@ public class ProgramadorRutas {
         }
         return horariosFiltrados;
     }
+
+    private void rechazarHorarioRangoInvalido(Horario horario) {
+
+        if (horario.getHoraSalida().isAfter(horario.getHoraLlegada())) {
+            throw new HorarioRangoInvalidoException();
+        }
+    }
+
+
+
+    private void rechazarHorarioSolapado(Horario horario) {
+        for (Horario horarioExistente : horarios) {
+            boolean esMismoBus = horarioExistente.getBus().getPlaca()
+                    .equals(horario.getBus().getPlaca());
+            boolean seSolapan = horario.getHoraSalida().isBefore(horarioExistente.getHoraLlegada())
+                    && horario.getHoraLlegada().isAfter(horarioExistente.getHoraSalida());
+
+            if (esMismoBus && seSolapan) {
+                throw new HorarioSolapadoException();
+            }
+        }
+    }
+
 
 }
