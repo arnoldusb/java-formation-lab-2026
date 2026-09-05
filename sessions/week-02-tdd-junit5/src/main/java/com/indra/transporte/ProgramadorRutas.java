@@ -2,12 +2,12 @@ package com.indra.transporte;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import com.indra.transporte.exception.HorarioRangoInvalidoException;
-import com.indra.transporte.exception.HorarioSolapadoException;
+import com.indra.transporte.exception.UnsupportedTypeException;
+import com.indra.transporte.model.Bus;
 import com.indra.transporte.model.Horario;
-import com.indra.transporte.model.TipoBus;
-import com.indra.transporte.model.TipoRuta;
+import com.indra.transporte.model.Tipo;
 
 import lombok.Data;
 
@@ -17,73 +17,99 @@ public class ProgramadorRutas {
     List<Horario> horarios = new ArrayList<>();
 
     public void programar(Horario horario) {
-        if (horario == null) {
-            throw new IllegalArgumentException("El horario no puede ser nulo");
-        }
-        rechazarHorarioSolapado(horario);
-        rechazarHorarioRangoInvalido(horario);
+        validarHorarioBase(horario);
+        validarDatosDelBus(horario.getBus());
+        validarDatosDeLaRuta(horario.getRuta());
+        validarRangoHorario(horario);
+        debeValidarTipoRutasYBuses(horario);
+        validarHorarioSolapado(horario);
         horarios.add(horario);
     }
 
-    public boolean debeValidarTipoRutasYBuses(Horario horario) {
+    private void validarHorarioBase(Horario horario) {
         if (horario == null) {
             throw new IllegalArgumentException("El horario no puede ser nulo");
         }
-        TipoBus tipoBus = TipoBus.from(horario.getBus().getTipo());
-        TipoRuta tipoRuta = TipoRuta.from(horario.getRuta().getTipo());
+        if (horario.getBus() == null) {
+            throw new IllegalArgumentException("El bus no puede ser nulo");
+        }
+        if (horario.getRuta() == null) {
+            throw new IllegalArgumentException("La ruta no puede ser nula");
+        }
+        if (horario.getHoraSalida() == null || horario.getHoraLlegada() == null) {
+            throw new IllegalArgumentException("La hora de salida y la de llegada no pueden ser nulas");
+        }
+    }
 
-        if (tipoBus == TipoBus.ELECTRIC && tipoRuta != TipoRuta.ELECTRIC) {
+    private void validarDatosDelBus(Bus bus) {
+        if (bus.getPlaca() == null || bus.getPlaca().isBlank()) {
+            throw new IllegalArgumentException("La placa del bus no puede estar vacía");
+        }
+    }
+
+    private void validarDatosDeLaRuta(com.indra.transporte.model.Ruta ruta) {
+        if (ruta.getCodigo() == null || ruta.getCodigo().isBlank()) {
+            throw new IllegalArgumentException("El código de la ruta no puede estar vacío");
+        }
+        if ((ruta.getOrigen() == null || ruta.getOrigen().isBlank())
+                || (ruta.getDestino() == null || ruta.getDestino().isBlank())) {
+            throw new IllegalArgumentException("El origen y destino de la ruta no pueden estar vacíos");
+        }
+    }
+
+    private void validarRangoHorario(Horario horario) {
+        if (horario.getHoraLlegada().isBefore(horario.getHoraSalida())) {
+            throw new IllegalArgumentException("La hora de llegada debe ser mayor a la de salida");
+        }
+    }
+
+    public boolean debeValidarTipoRutasYBuses(Horario horario) {
+        String tipoBus = horario.getBus().getTipo();
+        String tipoRuta = horario.getRuta().getTipo();
+
+        if (Tipo.ELECTRIC.getValor().equals(tipoBus) && !Tipo.ELECTRIC.getValor().equals(tipoRuta)) {
             throw new IllegalArgumentException("Los buses eléctricos solo pueden ir a rutas eléctricas");
         }
         return true;
     }
 
-    public List<Horario> consultarHorariosPorTipoBus(String busId, String tipoBus) {
-        if (busId == null || tipoBus == null) {
-            throw new IllegalArgumentException("El busId y el tipoBus no pueden ser nulos");
-        }
-        if (busId.isEmpty() || tipoBus.isEmpty()) {
-            throw new IllegalArgumentException("El busId y el tipoBus no pueden estar vacíos");
-        }
-        TipoBus tipoBusSolicitado = TipoBus.from(tipoBus);
-        List<Horario> horariosFiltrados = new ArrayList<>();
-        boolean busEncontrado = false;
-        for (Horario horario : horarios) {
-            if (horario.getBus().getPlaca().equals(busId)) {
-                busEncontrado = true;
-            }
-            if (horario.getBus().getPlaca().equals(busId)
-                    && TipoBus.from(horario.getBus().getTipo()) == tipoBusSolicitado) {
-                horariosFiltrados.add(horario);
-            }
-        }
-        if (!busEncontrado) {
-            throw new IllegalArgumentException("El bus no existe: " + busId);
-        }
-        return horariosFiltrados;
-    }
-
-    private void rechazarHorarioRangoInvalido(Horario horario) {
-
-        if (horario.getHoraSalida().isAfter(horario.getHoraLlegada())) {
-            throw new HorarioRangoInvalidoException();
-        }
-    }
-
-
-
-    private void rechazarHorarioSolapado(Horario horario) {
+    private void validarHorarioSolapado(Horario nuevoHorario) {
         for (Horario horarioExistente : horarios) {
-            boolean esMismoBus = horarioExistente.getBus().getPlaca()
-                    .equals(horario.getBus().getPlaca());
-            boolean seSolapan = horario.getHoraSalida().isBefore(horarioExistente.getHoraLlegada())
-                    && horario.getHoraLlegada().isAfter(horarioExistente.getHoraSalida());
+            if (!Objects.equals(horarioExistente.getBus().getPlaca(), nuevoHorario.getBus().getPlaca())) {
+                continue;
+            }
 
-            if (esMismoBus && seSolapan) {
-                throw new HorarioSolapadoException();
+            boolean seSolapa = nuevoHorario.getHoraSalida().isBefore(horarioExistente.getHoraLlegada())
+                    && nuevoHorario.getHoraLlegada().isAfter(horarioExistente.getHoraSalida());
+
+            if (seSolapa) {
+                throw new IllegalArgumentException("El horario se solapa con otro ya programado");
             }
         }
     }
 
+    public List<Horario> consultarHorariosPorTipoBus(Bus bus, String tipo) {
+        if (bus == null) {
+            throw new IllegalArgumentException("Bus desconocido");
+        }
+
+        if (tipo == null || !Tipo.isSupported(tipo)) {
+            throw new UnsupportedTypeException("Tipo de bus no soportado");
+        }
+
+        boolean busExistente = horarios.stream()
+                .map(Horario::getBus)
+                .anyMatch(b -> Objects.equals(b.getPlaca(), bus.getPlaca())
+                        && Objects.equals(b.getTipo(), bus.getTipo()));
+
+        if (!busExistente) {
+            throw new IllegalArgumentException("Bus desconocido");
+        }
+
+        return horarios.stream()
+                .filter(h -> Objects.equals(h.getBus().getPlaca(), bus.getPlaca()))
+                .filter(h -> Objects.equals(h.getBus().getTipo(), tipo))
+                .toList();
+    }
 
 }
