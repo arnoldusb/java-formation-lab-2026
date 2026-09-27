@@ -105,4 +105,22 @@ class OrderServiceApplicationTests {
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.errors[0]").value("Pedido no encontrado: missing-order"));
     }
+
+    @Test
+    void createOrder_shouldReturn500_whenUnexpectedExceptionOccurs() throws Exception {
+        CreateOrderRequest request = new CreateOrderRequest(
+                "customer-001",
+                List.of(new CreateOrderItemRequest("SKU-001", 2, 19.99)),
+                "Calle 123 # 45-67");
+
+        when(orderService.create(any(CreateOrderRequest.class)))
+                .thenThrow(new RuntimeException("error inesperado"));
+
+        mockMvc.perform(post("/api/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value(500))
+                .andExpect(jsonPath("$.errors[0]").value("Error interno del servidor"));
+    }
 }
