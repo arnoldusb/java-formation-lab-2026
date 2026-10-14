@@ -9,3 +9,9 @@
 - **Causa raíz**: `ServletUriComponentsBuilder.fromCurrentRequest.path("{id}")` pega automaticamente la url base mas el parametro no pone automatico el separador /
 - **Corrección**: `path("{id}")` por agregar `pathSegment("{id}")` agrege el / automaticamente
 - **Prevención**: mantener la prueba y usar pathSegment en vez de path cuando se requiere /.
+
+## Fallo 3 — error interno
+- **Síntoma**: test4 Status expected:<400> but was:<500>
+- **Causa raíz**: aunque el `CreateSupplierRequest` tiene las validaciones no se estan aplicando el controller no sabe que las debe aplicar.
+- **Corrección**: se agrego `@Valid` en el controller 
+- **Prevención**: mantener la prueba y crear pruebas nuevas que validen los parametros
