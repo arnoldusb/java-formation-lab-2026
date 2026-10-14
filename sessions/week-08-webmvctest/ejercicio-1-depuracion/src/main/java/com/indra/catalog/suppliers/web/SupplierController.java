@@ -39,13 +39,7 @@ public class SupplierController {
 
     @PostMapping
     public ResponseEntity<SupplierResponse> create(@Valid @RequestBody CreateSupplierRequest request) {
-        Supplier supplier = mapper.toDomain(request);
-        // Normalización exigida por el área de compras: razón social en mayúsculas y NIT sin puntos
-        supplier.setName(supplier.getName().trim().toUpperCase());
-        supplier.setTaxId(supplier.getTaxId().replace(".", "").trim());
-        supplier.setInternalNotes("Creado vía API el " + LocalDateTime.now());
-
-        Supplier created = supplierService.create(supplier);
+        Supplier created = supplierService.create(mapper.toDomain(request));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .pathSegment("{id}")

@@ -34,11 +34,8 @@ class SupplierControllerTest {
 
     @Test
     void test1() throws Exception {
-        Supplier supplier = new Supplier();
-        supplier.setId("SUP-001");
-        supplier.setName("ACME LTDA");
-        supplier.setTaxId("900123456-7");
-        supplier.setEmail("compras@acme.co");
+        Supplier supplier = new Supplier("ACME LTDA","900123456-7","compras@acme.co");
+        supplier.setId("SUP-001");  
         when(supplierService.findById("SUP-001")).thenReturn(supplier);
 
         mockMvc.perform(get("/api/suppliers/SUP-001"))

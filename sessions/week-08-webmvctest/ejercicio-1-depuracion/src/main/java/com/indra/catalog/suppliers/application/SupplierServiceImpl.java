@@ -16,10 +16,13 @@ public class SupplierServiceImpl implements SupplierService {
         this.repository = repository;
     }
 
-    @Override
     public Supplier create(Supplier supplier) {
-        supplier.setId("SUP-%03d".formatted(sequence.incrementAndGet()));
-        return repository.save(supplier);
+        Supplier validatedSupplier = new Supplier(
+                supplier.getName(),
+                supplier.getTaxId(),
+                supplier.getEmail());
+        validatedSupplier.setId("SUP-%03d".formatted(sequence.incrementAndGet()));
+        return repository.save(validatedSupplier);
     }
 
     public Supplier findById(String id) {

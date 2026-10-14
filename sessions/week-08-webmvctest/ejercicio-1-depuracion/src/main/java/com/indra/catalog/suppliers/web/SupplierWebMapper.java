@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 public class SupplierWebMapper {
 
     public Supplier toDomain(CreateSupplierRequest request) {
-        Supplier supplier = new Supplier();
-        supplier.setName(request.name());
-        supplier.setTaxId(request.taxId());
-        supplier.setEmail(request.email());
+        Supplier supplier = new Supplier(request.name(),request.taxId(),request.email());  
         return supplier;
     }
 
