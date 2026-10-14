@@ -15,3 +15,9 @@
 - **Causa raíz**: aunque el `CreateSupplierRequest` tiene las validaciones no se estan aplicando el controller no sabe que las debe aplicar.
 - **Corrección**: se agrego `@Valid` en el controller 
 - **Prevención**: mantener la prueba y crear pruebas nuevas que validen los parametros
+
+## Fallo 4 — sin/con contenido
+- **Síntoma**: test5 Status expected:<204> but was:<200>
+- **Causa raíz**: se esta retornado un ok(200 con cuerpo) para la eliminacion y esta espera un 204 ( ok pero sin cuerpo). por estandar ya que la eliminacion no requiere cuerpo.
+- **Corrección**: en controller metodo eliminar `ResponseEntity.ok().build()` por `ResponseEntity.noContent().build()`
+- **Prevención**: mantener la prueba actual, generar prueba para todos los codigo de retorno.
