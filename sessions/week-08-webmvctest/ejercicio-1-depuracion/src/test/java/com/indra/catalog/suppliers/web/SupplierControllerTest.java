@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,8 +39,10 @@ class SupplierControllerTest {
 
         mockMvc.perform(get("/api/suppliers/SUP-001"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(
-                        "{\"id\":\"SUP-001\",\"name\":\"ACME LTDA\",\"taxId\":\"900123456-7\",\"email\":\"compras@acme.co\"}"));
+                .andExpect(jsonPath("$.id").value("SUP-001"))
+                .andExpect(jsonPath("$.name").value("ACME LTDA"))
+                .andExpect(jsonPath("$.taxId").value("900123456-7"))
+                .andExpect(jsonPath("$.email").value("compras@acme.co"));
     }
 
     @Test
