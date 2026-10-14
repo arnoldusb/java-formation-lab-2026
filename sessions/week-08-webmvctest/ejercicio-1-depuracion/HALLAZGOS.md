@@ -21,3 +21,8 @@
 - **Causa raíz**: se esta retornado un ok(200 con cuerpo) para la eliminacion y esta espera un 204 ( ok pero sin cuerpo). por estandar ya que la eliminacion no requiere cuerpo.
 - **Corrección**: en controller metodo eliminar `ResponseEntity.ok().build()` por `ResponseEntity.noContent().build()`
 - **Prevención**: mantener la prueba actual, generar prueba para todos los codigo de retorno.
+
+
+## Refactors aplicados
+| Principio / práctica | Antes | Después | Test que lo respalda |
+| DIP | `SupplierController` dependía de `SupplierServiceImpl` concreto y `SupplierServiceImpl` instanciaba su repositorio interno. | El controlador depende de la abstracción `SupplierService` y el servicio recibe `SupplierRepository` vía inyección. | `SupplierControllerTest` |

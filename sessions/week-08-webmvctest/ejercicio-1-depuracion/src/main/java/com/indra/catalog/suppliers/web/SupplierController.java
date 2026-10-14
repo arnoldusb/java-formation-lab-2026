@@ -1,5 +1,6 @@
 package com.indra.catalog.suppliers.web;
 
+import com.indra.catalog.suppliers.application.SupplierService;
 import com.indra.catalog.suppliers.application.SupplierServiceImpl;
 import com.indra.catalog.suppliers.domain.Supplier;
 import com.indra.catalog.suppliers.web.dto.CreateSupplierRequest;
@@ -23,10 +24,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 @RequestMapping("/api/suppliers")
 public class SupplierController {
 
-    private final SupplierServiceImpl supplierService;
+    private final SupplierService supplierService;
     private final SupplierWebMapper mapper;
 
-    public SupplierController(SupplierServiceImpl supplierService, SupplierWebMapper mapper) {
+    public SupplierController(SupplierService supplierService, SupplierWebMapper mapper) {
         this.supplierService = supplierService;
         this.mapper = mapper;
     }
