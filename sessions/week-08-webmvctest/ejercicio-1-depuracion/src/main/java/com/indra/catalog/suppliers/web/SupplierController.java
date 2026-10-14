@@ -24,27 +24,25 @@ import jakarta.validation.Valid;
 public class SupplierController {
 
     private final SupplierService supplierService;
-    private final SupplierWebMapper mapper;
 
-    public SupplierController(SupplierService supplierService, SupplierWebMapper mapper) {
+    public SupplierController(SupplierService supplierService) {
         this.supplierService = supplierService;
-        this.mapper = mapper;
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SupplierResponse> findById(@PathVariable String id) {
-        return ResponseEntity.ok(mapper.toResponse(supplierService.findById(id)));
+        return ResponseEntity.ok(new SupplierWebMapper().toResponse(supplierService.findById(id)));
     }
 
     @PostMapping
     public ResponseEntity<SupplierResponse> create(@Valid @RequestBody CreateSupplierRequest request) {
-        Supplier created = supplierService.create(mapper.toDomain(request));
+        Supplier created = supplierService.create(new SupplierWebMapper().toDomain(request));
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .pathSegment("{id}")
                 .buildAndExpand(created.getId())
                 .toUri();
-        return ResponseEntity.created(location).body(mapper.toResponse(created));
+        return ResponseEntity.created(location).body(new SupplierWebMapper().toResponse(created));
     }
 
     @DeleteMapping("/{id}")

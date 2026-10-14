@@ -11,19 +11,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.indra.catalog.suppliers.application.SupplierService;
-import com.indra.catalog.suppliers.domain.Supplier;
-import com.indra.catalog.suppliers.domain.SupplierNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.indra.catalog.suppliers.application.SupplierService;
+import com.indra.catalog.suppliers.domain.Supplier;
+import com.indra.catalog.suppliers.domain.SupplierNotFoundException;
+
 @WebMvcTest(SupplierController.class)
-@Import(SupplierWebMapper.class)
 class SupplierControllerTest {
 
     @Autowired

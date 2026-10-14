@@ -30,3 +30,4 @@
 | SRP | La lógica de normalización estaba en el controller. | La validación y normalización de dominio se resuelven en `Supplier` y en el servicio. | `SupplierTest` |
 | Dominio | `Supplier` permitía estados inválidos. | el contructor `public Supplier(String name, String taxId, String email)` y los setters validan nombre, NIT y email. | `SupplierTest` |
 | Seguridad | El `ApiExceptionHandler` exponía `exception.toString()` en 500. | Se devuelve un mensaje genérico para no filtrar detalles internos. | `SupplierControllerTest` |
+| Diseño web | El mapper era una dependencia de Spring cargada no siempre necesaria. | dejo de ser un componete y paso a ser una clase normal con new, en el test ya no se importa. `@Import(SupplierWebMapper.class)`| `SupplierControllerTest` |
