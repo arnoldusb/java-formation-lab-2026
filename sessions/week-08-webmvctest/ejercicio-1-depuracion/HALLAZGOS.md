@@ -28,4 +28,5 @@
 |---|---|---|---|
 | DIP | `SupplierController` dependía de `SupplierServiceImpl` concreto y `SupplierServiceImpl` instanciaba su repositorio interno. | El controlador depende de la abstracción `SupplierService` y el servicio recibe `SupplierRepository` vía inyección. | `SupplierControllerTest` |
 | SRP | La lógica de normalización estaba en el controller. | La validación y normalización de dominio se resuelven en `Supplier` y en el servicio. | `SupplierTest` |
+| Dominio | `Supplier` permitía estados inválidos. | el contructor `public Supplier(String name, String taxId, String email)` y los setters validan nombre, NIT y email. | `SupplierTest` |
 
