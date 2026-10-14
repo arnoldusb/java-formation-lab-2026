@@ -2,6 +2,7 @@ package com.indra.catalog.suppliers.web;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -32,9 +33,9 @@ class SupplierControllerTest {
     private SupplierService supplierService;
 
     @Test
-    void test1() throws Exception {
-        Supplier supplier = new Supplier("ACME LTDA","900123456-7","compras@acme.co");
-        supplier.setId("SUP-001");  
+    void returnsSupplierWhenIdExists() throws Exception {
+        Supplier supplier = new Supplier("ACME LTDA", "900123456-7", "compras@acme.co");
+        supplier.setId("SUP-001");
         when(supplierService.findById("SUP-001")).thenReturn(supplier);
 
         mockMvc.perform(get("/api/suppliers/SUP-001"))
@@ -44,7 +45,7 @@ class SupplierControllerTest {
     }
 
     @Test
-    void test2() throws Exception {
+    void returnsNotFoundWhenSupplierDoesNotExist() throws Exception {
         when(supplierService.findById("SUP-999")).thenThrow(new SupplierNotFoundException("SUP-999"));
 
         mockMvc.perform(get("/api/suppliers/SUP-999"))
@@ -53,7 +54,7 @@ class SupplierControllerTest {
     }
 
     @Test
-    void test3() throws Exception {
+    void createsSupplierAndReturnsLocation() throws Exception {
         when(supplierService.create(any())).thenAnswer(invocation -> {
             Supplier supplier = invocation.getArgument(0);
             supplier.setId("SUP-001");
@@ -61,14 +62,14 @@ class SupplierControllerTest {
         });
 
         mockMvc.perform(post("/api/suppliers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "name": "  acme ltda ",
-                                    "taxId": "900.123.456-7",
-                                    "email": "compras@acme.co"
-                                }
-                                """))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "name": "  acme ltda ",
+                            "taxId": "900.123.456-7",
+                            "email": "compras@acme.co"
+                        }
+                        """))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "http://localhost/api/suppliers/SUP-001"))
                 .andExpect(jsonPath("$.name").value("ACME LTDA"))
@@ -76,24 +77,35 @@ class SupplierControllerTest {
     }
 
     @Test
-    void test4() throws Exception {
+    void rejectsSupplierWithBlankName () throws Exception {
         mockMvc.perform(post("/api/suppliers")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {
-                                    "name": "",
-                                    "taxId": "900.123.456-7",
-                                    "email": "compras@acme.co"
-                                }
-                                """))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {
+                            "name": "",
+                            "taxId": "900.123.456-7",
+                            "email": "compras@acme.co"
+                        }
+                        """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errors[0]").value(containsString("name")));
     }
 
     @Test
-    void test5() throws Exception {
+    void deletesSupplierWithoutResponseBody() throws Exception {
         mockMvc.perform(delete("/api/suppliers/SUP-001"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void rejectsEmptyBodyWithoutCallingService() throws Exception {
+        mockMvc.perform(post("/api/suppliers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(""))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST_BODY"));
+
+        verifyNoInteractions(supplierService);
     }
 }
