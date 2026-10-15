@@ -1,0 +1,52 @@
+@baseUrl = http://localhost:8082/api/products
+@editorAuth = ZWRpdG9yOmVkaXRvcjEyMw==
+@adminAuth = YWRtaW46YWRtaW4xMjM=
+
+@productId = PRD-0001
+### Crear producto (EDITOR o ADMIN); guarda el ID de la respuesta para las solicitudes siguientes
+# @name createProduct
+POST {{baseUrl}}
+Authorization: Basic {{editorAuth}}
+Content-Type: application/json
+
+{
+  "name": "Teclado mecanico",
+  "price": 1299.90,
+  "stock": 15
+}
+
+> {% client.global.set("productId", response.body.id); %}
+
+### Consultar el producto creado
+GET {{baseUrl}}/{{productId}}
+Accept: application/json
+
+### Crear producto sin autenticacion (esperado: 401 Unauthorized)
+POST {{baseUrl}}
+Content-Type: application/json
+
+{
+  "name": "Producto sin autenticacion",
+  "price": 25.50,
+  "stock": 3
+}
+
+### Crear producto con datos invalidos (esperado: 400 Bad Request)
+POST {{baseUrl}}
+Authorization: Basic {{adminAuth}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": 0.01,
+  "stock": -1
+}
+
+### Consultar un producto inexistente (esperado: 404 Not Found)
+GET {{baseUrl}}/PRD-0004
+Accept: application/json
+
+### Eliminar el producto creado (requiere ADMIN; esperado: 204 No Content)
+DELETE {{baseUrl}}/{{productId}}
+Authorization: Basic {{adminAuth}}
+
