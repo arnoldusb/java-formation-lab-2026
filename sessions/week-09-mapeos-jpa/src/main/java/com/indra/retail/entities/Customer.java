@@ -1,6 +1,7 @@
 package com.indra.retail.entities;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,12 +28,20 @@ public class Customer {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @Embedded
+    private Address address;
+
     protected Customer() {
     }
 
     public Customer(String name, String email) {
+        this(name, email, null);
+    }
+
+    public Customer(String name, String email, Address address) {
         this.name = name;
         this.email = email;
+        this.address = address;
     }
 
     public Long getId() {
@@ -57,5 +66,9 @@ public class Customer {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Address getAddress() {
+        return address;
     }
 }

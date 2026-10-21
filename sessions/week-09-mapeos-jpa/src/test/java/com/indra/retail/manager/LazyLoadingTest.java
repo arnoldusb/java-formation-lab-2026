@@ -6,6 +6,7 @@ import com.indra.retail.entities.OrderItem;
 import com.indra.retail.entities.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.PersistenceUnitUtil;
 import org.hibernate.LazyInitializationException;
 import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,7 +68,14 @@ class LazyLoadingTest {
     @DisplayName("Acceder a items dentro de una transacción activa funciona")
     void shouldLoadItemsInsideTransaction() {
         int itemCount = transactionTemplate.execute(status -> {
-            Order order = manager.findById(Order.class, orderId).orElseThrow();
+            Order order = entityManager.find(Order.class, orderId);
+            PersistenceUnitUtil persistenceUnitUtil = entityManager.getEntityManagerFactory()
+                    .getPersistenceUnitUtil();
+
+            assertFalse(persistenceUnitUtil.isLoaded(order, "items"));
+            assertEquals(1, order.getItems().size());
+            assertTrue(persistenceUnitUtil.isLoaded(order, "items"));
+            assertEquals("Laptop", order.getItems().get(0).getProduct().getName());
             return order.getItems().size();
         });
 
@@ -84,6 +92,18 @@ class LazyLoadingTest {
         String customerName = transactionTemplate.execute(status ->
                 manager.findById(Order.class, orderId).orElseThrow().getCustomer().getName());
         assertEquals("Carla", customerName);
+    }
+
+    @Test
+    @DisplayName("Product de un OrderItem no se carga hasta que se usa (LAZY)")
+    void shouldLoadProductLazily() {
+        OrderItem detachedItem = manager.findById(OrderItem.class, itemId).orElseThrow();
+
+        assertThrows(LazyInitializationException.class, () -> detachedItem.getProduct().getName());
+
+        String productName = transactionTemplate.execute(status ->
+                manager.findById(OrderItem.class, itemId).orElseThrow().getProduct().getName());
+        assertEquals("Laptop", productName);
     }
 
     @Test

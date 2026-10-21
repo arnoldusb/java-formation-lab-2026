@@ -1,5 +1,6 @@
 package com.indra.retail.manager;
 
+import com.indra.retail.entities.Address;
 import com.indra.retail.entities.Customer;
 import com.indra.retail.entities.Order;
 import com.indra.retail.entities.OrderItem;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.math.BigDecimal;
@@ -17,6 +19,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,6 +50,20 @@ class EntityManagerRecordManagerTest {
     }
 
     @Test
+    @DisplayName("Persiste y recupera la dirección embebida de un Customer")
+    void shouldPersistCustomerAddress() {
+        Address address = new Address("Calle 10 # 20-30", "Bogotá", "110111", "Colombia");
+        Customer saved = manager.create(new Customer("Ana", uniqueEmail(), address));
+
+        Customer found = manager.findById(Customer.class, saved.getId()).orElseThrow();
+
+        assertEquals("Calle 10 # 20-30", found.getAddress().getStreet());
+        assertEquals("Bogotá", found.getAddress().getCity());
+        assertEquals("110111", found.getAddress().getPostalCode());
+        assertEquals("Colombia", found.getAddress().getCountry());
+    }
+
+    @Test
     @DisplayName("Actualiza un Product")
     void shouldUpdateProduct() {
         Product saved = manager.create(new Product("Teclado", new BigDecimal("50.00"), 10));
@@ -56,6 +73,23 @@ class EntityManagerRecordManagerTest {
 
         Product found = manager.findById(Product.class, saved.getId()).orElseThrow();
         assertEquals(7, found.getStock());
+    }
+
+    @Test
+    @DisplayName("Rechaza una actualización obsoleta de Product")
+    void shouldRejectStaleProductUpdate() {
+        Product saved = manager.create(new Product("Teclado", new BigDecimal("50.00"), 10));
+        Product staleCopy = manager.findById(Product.class, saved.getId()).orElseThrow();
+        Product currentCopy = manager.findById(Product.class, saved.getId()).orElseThrow();
+
+        currentCopy.setStock(8);
+        Product updated = manager.update(currentCopy);
+
+        assertTrue(updated.getVersion() > saved.getVersion());
+        staleCopy.setStock(5);
+        assertThrows(ObjectOptimisticLockingFailureException.class, () -> manager.update(staleCopy));
+
+        assertEquals(8, manager.findById(Product.class, saved.getId()).orElseThrow().getStock());
     }
 
     @Test
