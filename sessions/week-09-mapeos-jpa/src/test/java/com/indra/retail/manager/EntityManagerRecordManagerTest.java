@@ -86,8 +86,6 @@ class EntityManagerRecordManagerTest {
     @Test
     @DisplayName("Persiste un Order con sus ítems en cascada")
     void shouldPersistOrderWithItems() {
-        // Todo en una transacción: las entidades quedan managed y el test no
-        // depende de qué cascade tenga el mapeo.
         Long[] ids = transactionTemplate.execute(status -> {
             Customer customer = manager.create(new Customer("Marta", uniqueEmail()));
             Product product = manager.create(new Product("Monitor", new BigDecimal("300.00"), 3));

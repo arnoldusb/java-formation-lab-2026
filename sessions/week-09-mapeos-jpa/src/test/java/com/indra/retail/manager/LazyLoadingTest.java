@@ -41,8 +41,6 @@ class LazyLoadingTest {
 
     @BeforeEach
     void createOrderWithItems() {
-        // Todo en una transacción: las entidades quedan managed y el test no
-        // depende de qué cascade tenga el mapeo.
         orderId = transactionTemplate.execute(status -> {
             Customer customer = manager.create(new Customer("Carla", UUID.randomUUID() + "@indra.com"));
             Product product = manager.create(new Product("Laptop", new BigDecimal("1500.00"), 4));
@@ -75,8 +73,6 @@ class LazyLoadingTest {
 
         assertEquals(1, itemCount);
     }
-
-    // ───────────────────────── Retos para participantes ─────────────────────────
 
     @Test
     @DisplayName("Customer de un Order no se carga hasta que se usa (LAZY)")
