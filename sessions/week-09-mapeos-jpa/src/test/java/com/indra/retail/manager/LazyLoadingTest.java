@@ -4,9 +4,11 @@ import com.indra.retail.entities.Customer;
 import com.indra.retail.entities.Order;
 import com.indra.retail.entities.OrderItem;
 import com.indra.retail.entities.Product;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.hibernate.LazyInitializationException;
+import org.hibernate.PropertyValueException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,9 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class LazyLoadingTest {
@@ -28,7 +32,12 @@ class LazyLoadingTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private Long orderId;
+    private Long itemId;
+    private Long productId;
 
     @BeforeEach
     void createOrderWithItems() {
@@ -38,8 +47,12 @@ class LazyLoadingTest {
             Customer customer = manager.create(new Customer("Carla", UUID.randomUUID() + "@indra.com"));
             Product product = manager.create(new Product("Laptop", new BigDecimal("1500.00"), 4));
             Order order = new Order(customer);
-            order.addItem(new OrderItem(product, 1, product.getPrice()));
-            return manager.create(order).getId();
+            OrderItem item = new OrderItem(product, 1, product.getPrice());
+            order.addItem(item);
+            manager.create(order);
+            itemId = item.getId();
+            productId = product.getId();
+            return order.getId();
         });
     }
 
@@ -66,34 +79,46 @@ class LazyLoadingTest {
     // ───────────────────────── Retos para participantes ─────────────────────────
 
     @Test
-    @Disabled("TODO(participante): habilitar tras cambiar las relaciones a LAZY")
     @DisplayName("Customer de un Order no se carga hasta que se usa (LAZY)")
     void shouldLoadCustomerLazily() {
-        // TODO: con Order.customer en LAZY, acceder a order.getCustomer().getName()
-        // fuera de la transacción debe lanzar LazyInitializationException,
-        // y dentro de una transacción debe funcionar.
+        Order detachedOrder = manager.findById(Order.class, orderId).orElseThrow();
+
+        assertThrows(LazyInitializationException.class, () -> detachedOrder.getCustomer().getName());
+
+        String customerName = transactionTemplate.execute(status ->
+                manager.findById(Order.class, orderId).orElseThrow().getCustomer().getName());
+        assertEquals("Carla", customerName);
     }
 
     @Test
-    @Disabled("TODO(participante): habilitar tras configurar orphanRemoval = true")
     @DisplayName("Quitar un ítem de la lista elimina la fila (orphanRemoval)")
     void shouldRemoveOrphanItem() {
-        // TODO: dentro de una transacción, quitar un ítem de order.getItems()
-        // y verificar que ya no existe en la base de datos.
+        transactionTemplate.executeWithoutResult(status -> {
+            Order order = entityManager.find(Order.class, orderId);
+            order.removeItem(order.getItems().get(0));
+            entityManager.flush();
+        });
+
+        assertFalse(manager.findById(OrderItem.class, itemId).isPresent());
     }
 
     @Test
-    @Disabled("TODO(participante): habilitar tras hacer order_id NOT NULL")
     @DisplayName("No se puede guardar un OrderItem sin Order")
     void shouldRejectOrphanOrderItem() {
-        // TODO: persistir un OrderItem sin Order debe fallar
-        // (p. ej. DataIntegrityViolationException / ConstraintViolationException).
+        Product product = manager.findById(Product.class, productId).orElseThrow();
+
+        assertThrows(PropertyValueException.class, () ->
+                transactionTemplate.executeWithoutResult(status -> {
+                    entityManager.persist(new OrderItem(product, 1, product.getPrice()));
+                    entityManager.flush();
+                }));
     }
 
     @Test
-    @Disabled("TODO(participante): habilitar tras quitar cascade desde OrderItem hacia Product")
     @DisplayName("Borrar un OrderItem no borra el Product")
     void shouldNotDeleteProductWhenDeletingItem() {
-        // TODO: eliminar un OrderItem y verificar que su Product sigue existiendo.
+        manager.delete(OrderItem.class, itemId);
+
+        assertTrue(manager.findById(Product.class, productId).isPresent());
     }
 }
